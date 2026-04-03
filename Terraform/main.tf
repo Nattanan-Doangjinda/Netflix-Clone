@@ -13,7 +13,7 @@ resource "aws_instance" "ec2" {
   subnet_id              = aws_subnet.public-subnet[count.index].id
   instance_type          = var.ec2_instance_type[count.index]
   iam_instance_profile   = "EMR_EC2_DefaultRole"
-  key_name               = "devsecops-k8s-key"
+  key_name               = "LoginKey"
   user_data = file("${path.module}/install.sh")
   vpc_security_group_ids = [aws_security_group.default-ec2-sg.id]
   root_block_device {
