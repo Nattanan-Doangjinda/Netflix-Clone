@@ -38,8 +38,8 @@ pipeline{
         
         stage('Install Dependencies') {
             steps {
-                dir('Application-Code'){
-                   sh "npm install" 
+                dir('Application-Code') {
+                    sh "npm install" 
                 }
             }
         }
@@ -63,16 +63,9 @@ pipeline{
             steps {
                 script {
                     dir('Application-Code'){
-                        // เปลี่ยน 'docker' ให้ตรงกับ Credentials ID และ Tool Name ที่คุณตั้งใน Jenkins
                         withDockerRegistry(credentialsId: 'docker') {
-                        
-                            // 1. Build Image (อย่าลืมเปลี่ยน API Key เป็นของคุณเอง)
                             sh "docker build --build-arg TMDB_V3_API_KEY=6c92ff51abccd904f6c5b897946dea9 -t netflix ."
-                            
-                            // 2. Tag Image (เปลี่ยน 'avianik' เป็น Username DockerHub ของคุณ)
                             sh "docker tag netflix noppakron/netflix:latest"
-                            
-                            // 3. Push ขึ้น DockerHub
                             sh "docker push noppakron/netflix:latest"
                         } 
                     }
@@ -82,7 +75,6 @@ pipeline{
         
         stage('TRIVY Image Scan') {
             steps {
-                // สแกนช่องโหว่ของ Image ที่เพิ่ง Push ขึ้นไป (เปลี่ยน 'avianik' เป็น Username ของคุณ)
                 sh "trivy image noppakron/netflix:latest > trivyimage.txt"
             }
         }
@@ -91,12 +83,13 @@ pipeline{
             steps{
                 script{
                     dir('Kubernetes') {
-                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                                sh 'kubectl apply -f deployment.yml'
-                                sh 'kubectl apply -f service.yml'
-                                sh 'kubectl get svc'
-                                sh 'kubectl get all'
-                        }   
+                        withKubeConfig(credentialsId: 'k8s') {
+                            sh 'kubectl apply -f deployment.yml'
+                            sh 'kubectl apply -f service.yml'
+                            sh 'kubectl rollout restart deployment/netflix-app'
+                            sh 'kubectl get svc'
+                            sh 'kubectl get all'
+                        }
                     }
                 }
             }
