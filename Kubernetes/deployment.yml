@@ -15,7 +15,8 @@ spec:
         app: netflix-app
     spec:
       containers:
-      - name: netflix-app
-        image: avian19/netflix:latest
+      - name: netflix
+        image: noppakron/netflix:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
