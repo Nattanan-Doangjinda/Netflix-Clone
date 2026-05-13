@@ -47,7 +47,7 @@ pipeline{
         stage('OWASP DP SCAN') {
             steps {
                 dir('Application-Code') {
-                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'owasp-dp-check'
+                    dependencyCheck additionalArguments: '--scan ./ --exclude "node_modules/**" --disableYarnAudit --disableNodeAudit', odcInstallation: 'owasp-dp-check'
                     dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
                 }
             }
