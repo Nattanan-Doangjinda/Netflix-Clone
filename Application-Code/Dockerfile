@@ -24,6 +24,8 @@ RUN yarn build && yarn cache clean
 # ---------- Stage 2: NGINX serve ----------
 FROM nginx:stable-alpine
 
+# Copy custom nginx config to handle SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Set working directory
 WORKDIR /usr/share/nginx/html
